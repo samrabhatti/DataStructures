@@ -26,41 +26,6 @@ private:
 	Node* root;
 	int count;
 
-	//bool getAccess(const T& key, Node*& par)
-	//{													//returns false when key doesnot exist previously
-	//	par = NULL;
-	//	Node* curr = root;
-	//	while (curr != NULL)
-	//	{
-	//		par = curr;
-	//		if (key == curr->data)				//key found
-	//			return false;				
-	//		else if (key < curr->data)
-	//			curr = curr->lchild;
-	//		else
-	//			curr = curr->rchild;
-	//	}
-	//	return true;							//key not found
-	//}
-
-	//bool getAccess(const T& key, Node*& par)
-	//{													//returns false when key doesnot exist previously
-	//	par = NULL;
-	//	Node* curr = root;
-	//	while (curr != NULL && curr->data != key)
-	//	{
-	//		par = curr;
-	//		//if (key == curr->data)				//key found
-	//		//	return false;
-	//		if (key < curr->data)
-	//			curr = curr->lchild;
-	//		else
-	//			curr = curr->rchild;
-	//	}
-	//	
-	//	return(curr != NULL);
-	//}
-
 	bool getAccess(const T& key, Node*& par, Node*& curr)
 	{													//returns false when key doesnot exist previously
 		par = NULL;
