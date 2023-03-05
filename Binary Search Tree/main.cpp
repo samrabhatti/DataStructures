@@ -1,3 +1,5 @@
+//This file contains different main functions to test your code. you can try out different examples given below and observe the behaviour of bst.
+
 //Skewed Tree
 t.Insert(1);
 t.Insert(2);
