@@ -368,6 +368,22 @@ private:
 
 	}
 
+	bool IsSubset(Node* tree, Node* subtree)
+	{
+		if (tree == NULL || subtree == NULL)
+			return false;
+		else
+		{
+			if (tree->data == subtree->data)
+			{
+				IsSubset(tree->lchild, subtree->lchild);
+				IsSubset(tree->rchild, subtree->rchild);
+
+			}
+		}
+		return true;
+	}
+
 	int getBreadth(Node* curr, int level)
 	{
 		if (curr == NULL)
@@ -377,6 +393,85 @@ private:
 			return 1;
 
 		return getBreadth(curr->lchild, level - 1) + getBreadth(curr->rchild, level - 1);
+	}
+
+	const T& Lowest(const T& a, const T& b)
+	{
+		Node* curr1 = NULL;
+		stack<Node*> ancestor1;
+		Node* curr2 = NULL;
+		stack<Node*> ancestor2;
+		if (getAccessUpdated(a, curr1, ancestor1) == true)
+		{
+			if (getAccessUpdated(b, curr2, ancestor2) == true)
+			{
+				while (ancestor1.empty() == false && ancestor2.empty() == false)
+				{
+					if (ancestor1.size() == ancestor2.size())
+					{
+						if (ancestor1.top() == ancestor2.top())
+							return ancestor1.top()->data;
+						else
+						{
+							ancestor1.pop();
+							ancestor2.pop();
+						}
+					}
+					else if (ancestor1.size() > ancestor2.size())
+					{
+						if (ancestor1.top() == ancestor2.top())
+							return ancestor1.top()->data;
+						else
+							ancestor1.pop();
+					}
+					else if (ancestor2.size() > ancestor1.size())
+					{
+						if (ancestor1.top() == ancestor2.top())
+							return ancestor1.top()->data;
+						else
+							ancestor2.pop();
+					}
+				}
+			}
+		}
+	}
+
+	void Trim(const T& key, Node* curr, int level, int count, int d)
+	{
+		if (curr == NULL)
+			return;
+
+		else
+		{
+			Node* temp = NULL;
+			stack<Node*>ancestor;
+			if (count == 0)
+			{
+				if (getAccessUpdated(key, temp, ancestor) == true)
+				{
+					d = getDepth(temp->data);
+					count++;
+				}
+			}
+			if (curr != NULL)
+			{
+				if (level < d)
+				{
+					if (curr->rchild != NULL)
+						Trim(d, curr->rchild, level + 1, count, d);
+					else if (curr->lchild != NULL)
+						Trim(d, curr->lchild, level + 1, count, d);
+				}
+
+				else if (level == d)
+				{
+					curr->lchild == NULL;
+					curr->rchild == NULL;
+				}
+			}
+
+
+		}
 	}
 
 public:
@@ -604,6 +699,50 @@ public:
 		return IsSubTree(root, obj.root);
 	}
 
+	//Task 10
+	bool SubSet(const bst& obj)
+	{
+		return IsSubset(root, obj.root);
+	}
+
+	//Task 11
+	void SearchAndPromote(const T& element)
+	{
+		Node* curr = NULL;
+		Node* par = NULL;
+		Node* temp = NULL;
+		stack<Node*>ancestor;
+		if (getAccessUpdated(element, curr, ancestor) == true)
+		{
+			if (ancestor.empty() == true)
+				return;
+			else
+			{
+				while (!ancestor.empty())
+				{
+					if (ancestor.size() == 1)
+					{
+						Erase(element);
+						temp = new Node(element);
+						par = ancestor.top();
+						ancestor.pop();
+						if (temp->data > par->data)
+							temp->lchild = par;
+						else
+							temp->rchild = par;
+
+						root = temp;
+
+					}
+					else
+					{
+						ancestor.pop();
+					}
+				}
+			}
+		}
+	}
+
 	//Task 12
 	int Breadth()
 	{
@@ -619,248 +758,165 @@ public:
 		return breadth;
 	}
 
+	//Task 13
+	void TrimBelowK(const T& k)
+	{
+		Trim(k, root, 0, 0, 0);
+	}
+
 	//Task 14
+	const T& LowestCommonAncestor(const T& a, const T& b)
+	{
+		T res = Lowest(a, b);
+		if (res == a)
+			cout << a << " is the key as well\n";
+		else if (res == b)
+			cout << b << " is the key as well\n";
+		return res;
+	}
 
 };
 
 int main()
 {
-	bst<int> t;
-
-	//Skewed Tree
-	t.Insert(1);
-	t.Insert(2);
-	t.Insert(3);
-	t.Insert(4);
-	t.Insert(3);
-	t.Insert(5);
-	t.Insert(6);
-
-	t.PrintInOrder();
-	cout << endl << endl;
-
-	//t.Erase(3);
-	// t.Erase(6);
-	// t.Erase(1);
-
-	//t.PrintInOrder();
-	//cout << endl << endl;
-
-	t.PrintTree();
-
-	cout << "Depth (4) : " << t.Depth(4) << endl << endl;
-
-	cout << "Height of BST: " << t.Heigth() << endl << endl;
-
-	cout << "Breadth of BST: " << t.Breadth() << endl << endl;
-
-	if (t.IsBalanced() == true)
-		cout << "Balanced\n";
-	else
-		cout << "Not Balanced\n";
-	cout << endl;
-
-	cout << "Successor of 6: " << t.Successor(6) << endl << endl;
-
-	cout << "Predecessor of 1: " << t.Predecessor(1) << endl << endl;
-
-	////Unskewed-Balanced
-	//t.Insert(50);
-	//t.Insert(83);
-	//t.Insert(90);
-	//t.Insert(89);
-	//t.Insert(100);
-	//t.Insert(106);
-	//t.Insert(3);
-	//t.Insert(5);
-	//t.Insert(71);
-	//t.Insert(9);
-	//t.Insert(6);
-	//t.Insert(56);
-
-	//t.PrintInOrder();
-	//cout << endl << endl;
-
-	//t.PrintTree();
-
-	////t.Erase(50);
-	////t.Erase(71);
-	//t.Erase(83);
-
-	//t.PrintInOrder();
-	//cout << endl << endl;
-
-	//t.PrintTree();
-
-	//cout << "Depth (56) : " << t.Depth(56) << endl << endl;
-
-	//cout << "Height of BST: " << t.Heigth() << endl << endl;
-	//
-	//if (t.IsBalanced() == true)
-	//	cout << "Balanced\n";
-	//else
-	//	cout << "Not Balanced\n";
-	//cout << endl;
-
-	//cout << "Successor of 9: " << t.Successor(9) << endl << endl;
-
-	//cout << "Predecessor of 9: " << t.Predecessor(9) << endl << endl;
-
-
-	////Assignment Question
-	//t.Insert(50);
-	//t.Insert(35);
-	//t.Insert(70);
-	//t.Insert(2);
-	//t.Insert(61);
-	//t.Insert(81);
-	//t.Insert(55);
-	//t.Insert(93);
-	//t.Insert(63);
-
-	//t.PrintInOrder();
-	//cout << endl << endl;
-
-	//t.PrintTree();
-
-	//cout << "Depth (81) : " << t.Depth(81) << endl << endl;
-
-	//cout << "Height of BST: " << t.Heigth() << endl << endl;
-
-	//if (t.IsBalanced() == true)
-	//	cout << "Balanced\n";
-	//else
-	//	cout << "Not Balanced\n";
-	//cout << endl;
-
-	//cout << "Successor of 63: " << t.Successor(63) << endl << endl;
-
-	//cout << "Predecessor of 61: " << t.Predecessor(61) << endl << endl;
-	//
-	//cout << "Path Sum: ";
-	//t.PathSum();
-	//cout << endl << endl;
-
-	////Balanced Example
-	//t.Insert(50);
-	//t.Insert(17);
-	//t.Insert(72);
-	//t.Insert(76);
-	//t.Insert(23);
-	//t.Insert(12);
-	//t.Insert(19);
-	//t.Insert(14);
-	//t.Insert(9);
-	//t.Insert(54);
-	//t.Insert(67);
-
-	//t.PrintInOrder();
-	//cout << endl << endl;
-
-	//t.PrintTree();
-
-	//cout << "Depth (9) : " << t.Depth(9) << endl << endl;
-
-	//cout << "Height of BST: " << t.Heigth() << endl << endl;
-
-	//if (t.IsBalanced() == true)
-	//	cout << "Balanced\n";
-	//else
-	//	cout << "Not Balanced\n";
-	//cout << endl;
-
-	//cout << "Successor of 72: " << t.Successor(72) << endl << endl;
-
-	//cout << "Predecessor of 54: " << t.Predecessor(54) << endl << endl;
-
-	//cout << "Path Sum: ";
-	//t.PathSum();
-	//cout << endl << endl;
-
-	//Balanced Example
-	/*int arr[] = { 3, 4, 5, 11, 21, 44, 71 };
-	bst<int>t(arr, 7);
-
-	t.PrintInOrder();
-	cout << endl << endl;
-
-	t.PrintTree();
-
-	cout << "Depth (3) : " << t.Depth(3) << endl << endl;
-
-	cout << "Height of BST: " << t.Heigth() << endl << endl;
-
-	cout << "Breadth of BST: " << t.Breadth() << endl << endl;
-
-	if (t.IsBalanced() == true)
-		cout << "BALANCED\n";
-	else
-		cout << "Not Balanced\n";
-	cout << endl;
-
-	cout << "Successor of 11: " << t.Successor(11) << endl << endl;
-
-	cout << "Predecessor of 11: " << t.Predecessor(11) << endl << endl;
-
-	cout << "Path Sum: ";
-	t.PathSum();
-	cout << endl << endl;*/
-
-	//Operator ==
-	/*t.Insert(50);
-	t.Insert(35);
-	t.Insert(70);
-	t.Insert(2);
-	t.Insert(61);
-	t.Insert(81);
-	t.Insert(55);
-	t.Insert(93);
-	t.Insert(63);
-
-	t.PrintInOrder();
-	cout << endl << endl;
-
-	t.PrintTree();*/
-
-	/*bst<int>t1;
+	bst <int> t1;
+	t1.Insert(50);
+	t1.Insert(35);
+	t1.Insert(70);
 	t1.Insert(2);
 	t1.Insert(61);
 	t1.Insert(81);
 	t1.Insert(55);
-	t1.Insert(93);
 	t1.Insert(63);
-	t1.Insert(50);
-	t1.Insert(35);
-	t1.Insert(70);
-
+	t1.Insert(93);
+	cout << "\n\t********* Tree 1 *************\n";
 	t1.PrintInOrder();
+	cout << endl;
+	t1.PrintTree();
 	cout << endl << endl;
 
+	//********* Task 1: Erase *************
+	cout << "\t********* Task 1: Erase *************\n";
+	t1.Erase(70);
+	t1.PrintInOrder();
+	cout << endl;
 	t1.PrintTree();
+	cout << endl << endl;
 
-	if (t == t1)
-		cout << "Both trees have Same Data\n";
+	//********* Task 2(a): Successor ************
+	cout << "\t********* Task 2(a): Successor ************\n";
+	cout << "Successor(61) in T1: ";
+	cout << t1.Successor(61);
+	cout << endl << endl;
+
+	//********* Task 2(b): Predecessor ************
+	cout << "\t********* Task 2(b): Predecessor ************\n";
+	cout << "Predecessor(61) in T1: ";
+	cout << t1.Predecessor(61);
+	cout << endl << endl;
+
+	//********* Task 3: Height ************
+	cout << "\t********* Task 3: Height ************\n";
+	cout << "Height of tree is: ";
+	cout << t1.Heigth();
+	cout << endl << endl;
+
+
+	//******** Task 4: Depth ************
+	cout << "\t******** Task 4: Depth ************\n";
+	cout << "Depth(61) in T1: ";
+	cout << t1.Depth(61);
+	cout << endl << endl;
+
+	//******** Task 5: Balanced ************
+	cout << "\t******** Task 5: Balanced ************\n";
+	cout << "Is T1 balanced? : ";
+	if (t1.IsBalanced() == true)
+		cout << "Yes\n";
 	else
-		cout << "Both trees have Different Data\n";
+		cout << "No\n";
 	cout << endl;
 
-	if (t1.SubTree(t) == true)
-		cout << "Yes it is a Subtree\n";
-	else
-		cout << "No it isnt a Subtree\n";
-	cout << endl;*/
 
-	cout << "Copy Constructor\n";
-	bst<int>t1 = t;
-	t1.PrintInOrder();
-	cout << endl << endl;
+	//******************TREE 2 *********************
+	cout << "\t********* Tree 2 *************\n";
 
-	cout << "Assignment Operator\n";
-	bst<int>t2;
-	t2 = t1;
+	//******* Task 6: Sorted Array *************
+	cout << "\t******* Task 6: Sorted Array *************\n";
+	cout << "\n\n\t\t\tTree 2 is: \n";
+	int arr[8] = { 2, 35, 50, 55, 61, 63, 81, 93 };
+	bst<int> t2(arr, 8);
 	t2.PrintInOrder();
+	cout << endl;
+	if (t2.IsBalanced() == true)
+		cout << "Balanced\n";
+	else
+		cout << "Not Balanced\n";
+
+	t2.PrintTree();
+
+	//******** Task 7: Path Sum *************
+	cout << "\t******** Task 7: Path Sum *************\n";
+	cout << "Path Sum in T2 is: ";
+	t2.PathSum();
 	cout << endl << endl;
+
+	//********* Task 8: Operator ==  ************
+	cout << "\t********* Task 8: Operator ==  ************\n";
+	cout << "Are both trees equal? : ";
+	if (t1 == t2)
+		cout << "Yes\n";
+	else
+		cout << "No\n";
+	cout << endl;
+
+	//********* Task 9: Subtree ************
+	cout << "\t********* Task 9: Subtree ************\n";
+	cout << "Is T2 a subtree of T1? : ";
+	if (t1.SubTree(t1) == false)
+		cout << " No\n";
+	else
+		cout << "Yes\n";
+	cout << endl;
+
+	//********* Task 10: Subset ************
+	cout << "\t********* Task 10: Subset ************\n";
+	cout << "Is T2 a subset of T1? : ";
+	if (t1.SubSet(t2) == true)
+		cout << " Yes\n";
+	else
+		cout << "No\n";
+	cout << endl;
+
+	//******* Task 11: Search And Promote *********
+	cout << "\t******* Task 11: Search And Promote *********\n";
+	cout << "Search And Promote (93) in T2: ";
+	t2.SearchAndPromote(93);
+	t2.PrintInOrder();
+	cout << endl;
+	t2.PrintTree();
+
+	//******** Task 12: Breadth **************
+	cout << "\t******** Task 12: Breadth **************\n";
+	cout << "Maximum Breadth of T2: ";
+	cout << t2.Breadth() << endl;
+	cout << endl;
+
+	//******** Task 13: Trim Below K ***********
+	cout << "\t******** Task 13: Trim Below K ***********\n";
+	cout << "Trim Below k (63) in T2: ";
+	t2.TrimBelowK(63);
+	t2.PrintInOrder();
+	cout << endl;
+	t2.PrintTree();
+
+	//******* Task 14: Lowest Common Ancestor *********
+	cout << "\t******* Task 14: Lowest Common Ancestor *********\n";
+	cout << "Lowest Common Ancestor (55,81) in T2: ";
+	cout << t2.LowestCommonAncestor(55, 81);
+	cout << endl << endl << endl;
 
 	system("pause");
 	return 0;
+
 }
